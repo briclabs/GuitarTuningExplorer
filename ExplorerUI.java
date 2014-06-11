@@ -137,7 +137,7 @@ public class ExplorerUI extends JFrame {
 			}
 			
 		copyrightNotice = new JLabel(); // nice to have this in there so you see it even without the About page
-		copyrightNotice.setText("2014 Eric Hohlfeld / E3S");
+		copyrightNotice.setText("(c) 2014 Eric Hohlfeld / E3Dev");
 		
 		menuBar = new JMenuBar();
 		fileMenu = new JMenu();
