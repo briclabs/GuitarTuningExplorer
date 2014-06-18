@@ -80,6 +80,7 @@ public class ExplorerUI extends JFrame {
 		initComponents();
 	}
 
+	// Used to configure a string
 	private void configString(JSpinner string, int s){
 	    	final int stringNum = s;
 		string.setModel(new SpinnerListModel(shortNotelist));
@@ -92,26 +93,41 @@ public class ExplorerUI extends JFrame {
 		});
 	}
 	
+	// Open Note Change Reactions
+	private void stringStateChanged(JSpinner string, int s){
+	    	
+	    	// relabels all frets in active string
+		for (int f = 0; f < fretCount; f++){
+		    frets.get(s).get(f).setText(nextPitch(string,f));
+		   
+		    // plays the open fret
+		    if (f == 0){
+			frets.get(s).get(f).playOpen();			
+		    }
+		    
+		}
+	}
+	
 	private void initComponents() {
 		labelInstructions = new JLabel();
 			labelInstructions.setText("Choose open notes:");
 		
-	    for (int s = 0; s < stringCount; s++){					// BUILD FRETS AND STORE AS COLLECTIONS ORGANIZED BY STRING... some serious magic happens here
+	    for (int s = 0; s < stringCount; s++){				// BUILD FRETS AND STORE AS COLLECTIONS ORGANIZED BY STRING... some serious magic happens here
 		strings.add(new JSpinner());					// creates strings
-		configString(strings.get(s), s); 							// configures strings
+		configString(strings.get(s), s); 				// configures strings
 		List<MidiFret> currentString = new ArrayList<MidiFret>();	// fret container dec and init
-		System.out.print("String " + s + " ::");						// string status console log START
+		System.out.print("String " + s + " ::");			// string status console log START
 
 		for (int f = 0; f < fretCount; f++){
-		    MidiFret thisFret;											// init an instance of a fret
+		    MidiFret thisFret;						// init an instance of a fret
 		    Thread fretThread = new Thread(thisFret = new MidiFret());	// init a thread consisting of that fret
-		    fretThread.start();											// start that thread
-		    currentString.add(thisFret);									// add the fret which has been started as a thread to the container for the currently iterated string
-		    System.out.print(" " + f );		    							// fret status console log entry
+		    fretThread.start();						// start that thread
+		    currentString.add(thisFret);				// add the fret which has been started as a thread to the container for the currently iterated string
+		    System.out.print(" " + f );		    			// fret status console log entry
 		}
 
-		frets.add(currentString);									// store the sub-collection of frets just created as the representation of the current string iteration in the main fret collection
-		System.out.println();										// string status console log END
+		frets.add(currentString);					// store the sub-collection of frets just created as the representation of the current string iteration in the main fret collection
+		System.out.println();						// string status console log END
 		
 	    }
 	    
@@ -139,53 +155,53 @@ public class ExplorerUI extends JFrame {
 		copyrightNotice = new JLabel(); // nice to have this in there so you see it even without the About page
 		copyrightNotice.setText("(c) 2014 Eric Hohlfeld / E3Dev");
 		
+		// Set general window management stuff
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setTitle("Guitar Tuning Explorer");
+		setName("mainWindow"); // NOI18N
+		
+		// Init menu items
 		menuBar = new JMenuBar();
 		fileMenu = new JMenu();
 			exitMenuItem = new JMenuItem();
 		aboutMenu = new JMenu();
 			aboutMenuItem = new JMenuItem();
 
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setTitle("Guitar Tuning Explorer");
-		setName("mainWindow"); // NOI18N
-
+		// Config File menu
 		fileMenu.setMnemonic('f');
 		fileMenu.setText("File");
-
-		exitMenuItem.setMnemonic('x');
-		exitMenuItem.setText("Exit");
-		exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				exitMenuItemActionPerformed(evt);
-			}
-		});
-		
+			exitMenuItem.setMnemonic('x');
+			exitMenuItem.setText("Exit");
+			exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					exitMenuItemActionPerformed(evt);
+				}
+			});
 		fileMenu.add(exitMenuItem);
-
 		menuBar.add(fileMenu);
 
+		// Config About menu
 		aboutMenu.setMnemonic('a');
 		aboutMenu.setText("About");
-
-		aboutMenuItem.setMnemonic('a');
-		aboutMenuItem.setText("About");
-
-		aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
-		    public void actionPerformed(java.awt.event.ActionEvent evt) {
-			aboutMenuItemActionPerformed(evt);
-		    }
-		});
-		
+			aboutMenuItem.setMnemonic('a');
+			aboutMenuItem.setText("About");
+			aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			    public void actionPerformed(java.awt.event.ActionEvent evt) {
+				aboutMenuItemActionPerformed(evt);
+			    }
+			});
 		aboutMenu.add(aboutMenuItem);
-		
 		menuBar.add(aboutMenu);
 
+		// Set the menu bar as configured
 		setJMenuBar(menuBar);
 
+		//*** BEGIN LAYOUT SECTION ***
+		
 		GroupLayout layout = new GroupLayout(getContentPane()); // CREATES THE MAIN LAYOUT OBJECT
 		getContentPane().setLayout(layout); // SETS THE CONTENT PANE TO USE THE MAIN LAYOUT OBJECT
 		
-		// HORIZONTAL GROUP GENERATION AND ASSIGNMENT
+			// HORIZONTAL GROUP GENERATION AND ASSIGNMENT
 		
                 		GroupLayout.Group baseHorizGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING); // CREATES THE BASIC HORIZONTAL LAYOUT GROUP OBJECT, WHICH IS JUST A CONTAINER
                 		GroupLayout.SequentialGroup baseHorizSeqGroup = layout.createSequentialGroup(); // CREATES THE BASELINE SEQUENTIAL GROUP WHICH HOSTS THE CONTENT ITSELF
@@ -227,7 +243,7 @@ public class ExplorerUI extends JFrame {
                 		baseHorizGroup.addGroup(baseHorizSeqGroup);	// Add the baseline sequential group to the basic horizontal layout group
                 		layout.setHorizontalGroup(baseHorizGroup);	// Set the horizontal group to be the basic horizontal layout group, which has been filled out with the appropriate content
                 		
-                // VERTICAL GROUP GENERATION AND ASSIGNMENT
+          		// VERTICAL GROUP GENERATION AND ASSIGNMENT
                 		
                 		GroupLayout.Group baseVertGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING); // CREATES THE BASIC VERTICAL GROUP OBJECT, WHICH IS JUST A CONTAINER
                 		GroupLayout.SequentialGroup baseVertSeqGroup = layout.createSequentialGroup(); // CREATES THE BASELINE SEQUENTIAL GROUP WHICH HOSTS THE CONTENT ITSELF
@@ -289,10 +305,11 @@ public class ExplorerUI extends JFrame {
                 		baseVertGroup.addGroup(baseVertSeqGroup); // Add the baseline sequential group to the basic vertical layout group
                 		layout.setVerticalGroup(baseVertGroup); // Set the vertical group to be the basic vertical layout group, which has been filled out with the appropriate content
 
-                // GENERATION DONE
+                	// GENERATION DONE
                 		
                 		pack();
-		
+                		
+		// *** END LAYOUT SECTION ***
 	}
 
 	
@@ -307,35 +324,17 @@ public class ExplorerUI extends JFrame {
 	    	    }
 	    	});
 	}
-	
-	// Open Note Change Reactions
-	private void stringStateChanged(JSpinner string, int s){
-	    	
-	    	// relabel all frets in active string
-		for (int f = 0; f < fretCount; f++){
-		    frets.get(s).get(f).setText(nextPitch(string,f));
-		   
-		    // play the open fret
-		    if (f == 0){
-			frets.get(s).get(f).playOpen();			
-		    }
-		    
-		}
-	}
 
-	
-	// Method to determine appropriate label for a given fret
+	// Dynamically determines appropriate label for a given fret
 	private String nextPitch(JSpinner openString, int fretNum){
-		//fretNum = fretNum - 1; // so that it starts performing iterations for the 1st fret instead of the 0th
-		JSpinner dummyString = new JSpinner();
+		JSpinner dummyString = new JSpinner(); // used to simplify determining next position in note list
 		dummyString.setModel(new SpinnerListModel(longNotelist));
 		dummyString.setValue(openString.getValue());
 		
 		for(int nextFret = 0; nextFret < fretNum; nextFret++){
 			dummyString.setValue(dummyString.getNextValue());
 			}
-		
-		
+			
 		return dummyString.getValue().toString();
 	}
 	
