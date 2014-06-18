@@ -10,16 +10,16 @@ package explorer;
  */
 public class MidiFret extends javax.swing.JToggleButton implements Runnable {
 
-    //eclipse told me I need this
+    	//eclipse told me I need this
 	private static final long serialVersionUID = -1624226476941801601L;
 	
 	private int freq;
-    private String note;
-    final MidiSynth synth = new MidiSynth();
-    javax.swing.JToggleButton button;
-    public int getFreq (String note){
+	private String note;
+    	final MidiSynth synth = new MidiSynth();
+    	javax.swing.JToggleButton button;
+    	public int getFreq (String note){
         
-        // <editor-fold defaultstate="collapsed" desc="Frequency">        
+        // Maps note name to MIDI pitch index        
         switch(note){
              case "0C":
                 freq = 12;
@@ -353,7 +353,6 @@ public class MidiFret extends javax.swing.JToggleButton implements Runnable {
                 break;
         }
         return freq;
-        // </editor-fold>
     }
     
     // CONSTRUCTOR
@@ -382,23 +381,26 @@ public class MidiFret extends javax.swing.JToggleButton implements Runnable {
         }
     }
     
+    // Play the current note set for the open string
     public void playOpen() {
         note = this.button.getText();
         freq = getFreq(note);
         
         synth.MidiStart();
-        synth.midiChannel[0].programChange(0, 25);
+        synth.midiChannel[0].programChange(0, 25); // ensure this is a nice sound for a brief note play
         synth.midiChannel[0].noteOn(freq, 50);
     }
     
+    // Continuously play the current note set for the given fret
     private void playFret() {
         note = this.button.getText();
         freq = getFreq(note);
         synth.MidiStart();
-        synth.midiChannel[0].programChange(0, 30);
+        synth.midiChannel[0].programChange(0, 30); // ensure this is a continuous sound for a continuous note play
         synth.midiChannel[0].noteOn(freq, 50);
     }
     
+    // Used to terminate the playing of a continuous note
     private void stop() {
         synth.midiChannel[0].noteOff(freq, 0);
     }
